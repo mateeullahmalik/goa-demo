@@ -1,0 +1,441 @@
+openapi: 3.0.3
+info:
+  title: Demo Service
+  description: HTTP service for managing user & their loans
+  version: "1.0"
+servers:
+- url: http://localhost:8000
+  description: demo hosts the loan, user and swagger services.
+paths:
+  /loans:
+    get:
+      tags:
+      - loan
+      summary: listLoans loan
+      description: List all stored loans
+      operationId: loan#listLoans
+      responses:
+        "200":
+          description: OK response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoanResponseTinyCollection'
+              example:
+              - amount: 50
+                borrower_id: 1
+                id: 1
+                lender_id: 1
+              - amount: 50
+                borrower_id: 1
+                id: 1
+                lender_id: 1
+              - amount: 50
+                borrower_id: 1
+                id: 1
+                lender_id: 1
+              - amount: 50
+                borrower_id: 1
+                id: 1
+                lender_id: 1
+  /loans/{id}:
+    get:
+      tags:
+      - loan
+      summary: getLoan loan
+      description: get loan by ID
+      operationId: loan#getLoan
+      parameters:
+      - name: view
+        in: query
+        description: View to render
+        allowEmptyValue: true
+        schema:
+          type: string
+          description: View to render
+          default: default
+          example: default
+          enum:
+          - default
+          - tiny
+        example: tiny
+      - name: id
+        in: path
+        description: ID of loan to show
+        required: true
+        schema:
+          type: integer
+          description: ID of loan to show
+          example: 8889609907786479163
+          format: int64
+        example: 3740338447065494917
+      responses:
+        "200":
+          description: OK response.
+          content:
+            application/json:
+              schema:
+                description: 'Response body may alternatively be #/components/schemas/LoanResponseTiny'
+                $ref: '#/components/schemas/Loan'
+              example:
+                amount: 50
+                borrower_id: 1
+                description: Inventore quia dolores.
+                id: 1
+                lender_id: 1
+                payback_date: Dolore non alias necessitatibus.
+        "404":
+          description: Not Found response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+              example:
+                id: Maiores non est qui doloribus et sunt.
+                message: user 1 not found
+  /swagger/swagger.json:
+    get:
+      tags:
+      - swagger
+      summary: Download gen/http/openapi.json
+      description: JSON document containing the API swagger definition
+      operationId: swagger#/swagger/swagger.json
+      responses:
+        "200":
+          description: File downloaded
+  /users:
+    get:
+      tags:
+      - user
+      summary: listUsers user
+      description: List all stored users
+      operationId: user#listUsers
+      responses:
+        "200":
+          description: OK response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseTinyCollection'
+              example:
+              - id: 1
+                name: Jesse owens
+              - id: 1
+                name: Jesse owens
+              - id: 1
+                name: Jesse owens
+    post:
+      tags:
+      - user
+      summary: createUser user
+      description: create new user and return its ID.
+      operationId: user#createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequestBody'
+            example:
+              email: jhon@doe.com
+              id: 1
+              name: Jesse owens
+              score: 100
+      responses:
+        "201":
+          description: Created response.
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Itaque nihil earum esse.
+              example: Saepe dolorum aut.
+  /users/{id}:
+    delete:
+      tags:
+      - user
+      summary: removeUser user
+      description: Remove user
+      operationId: user#removeUser
+      parameters:
+      - name: id
+        in: path
+        description: ID of user to remove
+        required: true
+        schema:
+          type: string
+          description: ID of user to remove
+          example: Facilis architecto voluptatibus saepe ut voluptatem.
+        example: Velit dignissimos debitis.
+      responses:
+        "204":
+          description: No Content response.
+    get:
+      tags:
+      - user
+      summary: getUser user
+      description: get user by ID
+      operationId: user#getUser
+      parameters:
+      - name: view
+        in: query
+        description: View to render
+        allowEmptyValue: true
+        schema:
+          type: string
+          description: View to render
+          example: tiny
+          enum:
+          - default
+          - tiny
+        example: default
+      - name: id
+        in: path
+        description: ID of user to show
+        required: true
+        schema:
+          type: string
+          description: ID of user to show
+          example: Facere unde id.
+        example: Qui est.
+      responses:
+        "200":
+          description: OK response.
+          content:
+            application/json:
+              schema:
+                description: 'Response body may alternatively be #/components/schemas/UserResponseTiny'
+                $ref: '#/components/schemas/User'
+              example:
+                email: jhon@doe.com
+                id: 1
+                name: Jesse owens
+                score: 100
+        "404":
+          description: Not Found response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+              example:
+                id: Error ea nemo voluptatem.
+                message: user 1 not found
+components:
+  schemas:
+    CreateUserRequestBody:
+      type: object
+      properties:
+        email:
+          type: string
+          description: email address of user
+          example: jhon@doe.com
+        id:
+          type: integer
+          description: ID is the unique id of the user.
+          example: 1
+          format: int64
+        name:
+          type: string
+          description: 'Full Name of the user '
+          example: Jesse owens
+          minLength: 3
+          maxLength: 128
+        score:
+          type: integer
+          description: Score is user's loan score
+          example: 100
+          minimum: 0
+          maximum: 1000
+      example:
+        email: jhon@doe.com
+        id: 1
+        name: Jesse owens
+        score: 100
+      required:
+      - id
+      - name
+      - email
+    Loan:
+      type: object
+      properties:
+        amount:
+          type: number
+          description: Loan amount
+          example: 50
+          minimum: 50
+          maximum: 500
+        borrower_id:
+          type: integer
+          description: id of borrower
+          example: 1
+          format: int64
+        description:
+          type: string
+          description: description
+          example: Quo sapiente in delectus provident itaque sint.
+        id:
+          type: integer
+          description: ID is the unique id of the loan
+          example: 1
+          format: int64
+        lender_id:
+          type: integer
+          description: id of lender
+          example: 1
+          format: int64
+        payback_date:
+          type: string
+          description: Date on which the loan is supposed to be paid back
+          example: Aliquid dolor dolorem sequi ut.
+      example:
+        amount: 50
+        borrower_id: 1
+        description: Sit deserunt.
+        id: 1
+        lender_id: 1
+        payback_date: Repellat ex dignissimos neque atque eius nulla.
+      required:
+      - id
+      - amount
+      - lender_id
+      - borrower_id
+    LoanResponseTiny:
+      type: object
+      properties:
+        amount:
+          type: number
+          description: Loan amount
+          example: 50
+          minimum: 50
+          maximum: 500
+        borrower_id:
+          type: integer
+          description: id of borrower
+          example: 1
+          format: int64
+        id:
+          type: integer
+          description: ID is the unique id of the loan
+          example: 1
+          format: int64
+        lender_id:
+          type: integer
+          description: id of lender
+          example: 1
+          format: int64
+      description: A Loan describes a loan in loan service. (tiny view)
+      example:
+        amount: 50
+        borrower_id: 1
+        id: 1
+        lender_id: 1
+      required:
+      - id
+      - amount
+      - lender_id
+      - borrower_id
+    LoanResponseTinyCollection:
+      type: array
+      items:
+        $ref: '#/components/schemas/LoanResponseTiny'
+      description: ListLoansResponseBody is the result type for an array of LoanResponse
+        (tiny view)
+      example:
+      - amount: 50
+        borrower_id: 1
+        id: 1
+        lender_id: 1
+      - amount: 50
+        borrower_id: 1
+        id: 1
+        lender_id: 1
+    NotFound:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of missing resource
+          example: Doloremque reprehenderit qui quas earum similique.
+        message:
+          type: string
+          description: Message of error
+          example: user 1 not found
+      description: Loan not found
+      example:
+        id: Consectetur dicta quisquam.
+        message: user 1 not found
+      required:
+      - message
+      - id
+    User:
+      type: object
+      properties:
+        email:
+          type: string
+          description: email address of user
+          example: jhon@doe.com
+        id:
+          type: integer
+          description: ID is the unique id of the user.
+          example: 1
+          format: int64
+        name:
+          type: string
+          description: 'Full Name of the user '
+          example: Jesse owens
+          minLength: 3
+          maxLength: 128
+        score:
+          type: integer
+          description: Score is user's loan score
+          example: 100
+          minimum: 0
+          maximum: 1000
+      example:
+        email: jhon@doe.com
+        id: 1
+        name: Jesse owens
+        score: 100
+      required:
+      - id
+      - name
+      - email
+    UserResponseTiny:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID is the unique id of the user.
+          example: 1
+          format: int64
+        name:
+          type: string
+          description: 'Full Name of the user '
+          example: Jesse owens
+          minLength: 3
+          maxLength: 128
+      description: A User describes a user retrieved by the user service. (tiny view)
+      example:
+        id: 1
+        name: Jesse owens
+      required:
+      - id
+      - name
+    UserResponseTinyCollection:
+      type: array
+      items:
+        $ref: '#/components/schemas/UserResponseTiny'
+      description: ListUsersResponseBody is the result type for an array of UserResponse
+        (tiny view)
+      example:
+      - id: 1
+        name: Jesse owens
+      - id: 1
+        name: Jesse owens
+tags:
+- name: loan
+  description: The loan service makes it possible to view, add or remove loans
+- name: swagger
+  description: The swagger service serves the API swagger definition.
+- name: user
+  description: The user service makes it possible to view, add or remove users
